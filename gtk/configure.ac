@@ -58,6 +58,10 @@ PKG_CHECK_MODULES(GMODULE2, gmodule-2.0, [HAVE_GMODULE2=yes], [HAVE_GMODULE2=no]
 if test "$HAVE_GMODULE2" = "no"; then
    	AC_MSG_ERROR("cannot find gmodule2 library")
 fi
+PKG_CHECK_MODULES(GIO2, gio-2.0 gio-unix-2.0, [HAVE_GIO2=yes], [HAVE_GIO2=no])
+if test "$HAVE_GIO2" = "no"; then
+   AC_MSG_ERROR("cannot find glib gio library")
+fi
 
 # check for gtk
 AC_MSG_CHECKING(for Gtk required version)
@@ -144,20 +148,9 @@ AM_CONDITIONAL([USE_APPINDICATOR_3], [test "$appindicator_version" = "appindicat
 AM_CONDITIONAL([USE_APPINDICATOR], [test "$appindicator_version" = "appindicator"])
 
 
-#if test "$HAVE_APPINDICATOR_3" = "no"; then
-#   AC_MSG_ERROR("cannot find appindicator3 library")
-#fi
-#AC_DEFINE(APPINDICATOR_3, 1, [Define APPINDICATOR_3 to 1 if you have the appindicator3 library])
-  # check for AppIndicator
-#  PKG_CHECK_MODULES(AppIndicator, appindicator-0.1, [HAVE_APPINDICATOR=yes], [HAVE_APPINDICATOR=no])
-#  if test "$HAVE_APPINDICATOR" = "no"; then
-#    AC_MSG_ERROR(cannot find AppIndicator library)
-#  fi
-#  AC_DEFINE(APPINDICATOR,1,[Define APPINDICATOR to enable AppIndicator support])
-
-
 # Output files
 AC_CONFIG_FILES([
 Makefile
+src/Makefile
 ])
 AC_OUTPUT

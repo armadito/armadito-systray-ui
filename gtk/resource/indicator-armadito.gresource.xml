@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/armadito/indicator">
+    <file compressed="yes" preprocess="xml-stripblanks">ui/indicator-armadito.ui</file>
+  </gresource>
+</gresources>
