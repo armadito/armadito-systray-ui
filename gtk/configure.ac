@@ -77,7 +77,7 @@ gtk2)
 	fi
 	;;
 gtk3)
-	PKG_CHECK_MODULES(GTK3, gtk+-3.0, [HAVE_GTK3=yes], [HAVE_GTK3=no])
+	PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.10], [HAVE_GTK3=yes], [HAVE_GTK3=no])
 	if test "$HAVE_GTK3" = "no" ; then
 	   	AC_MSG_ERROR([--with-gtk=gtk3 required but gtk3 library not found])
 	else
@@ -85,7 +85,7 @@ gtk3)
 	fi
 	;;
 check)
-	PKG_CHECK_MODULES(GTK3, gtk+-3.0, [HAVE_GTK3=yes], [HAVE_GTK3=no])
+	PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.10], [HAVE_GTK3=yes], [HAVE_GTK3=no])
 	if test "$HAVE_GTK3" = "yes" ; then
 	   	gtk_version=gtk3
 	else
@@ -151,6 +151,8 @@ AM_CONDITIONAL([USE_APPINDICATOR], [test "$appindicator_version" = "appindicator
 # Output files
 AC_CONFIG_FILES([
 Makefile
+icons/Makefile
+icons/scalable/Makefile
 src/Makefile
 ])
 AC_OUTPUT

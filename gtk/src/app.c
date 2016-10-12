@@ -12,6 +12,10 @@
 #define RESOURCE_ROOT "/org/armadito/indicator"
 #define UI_RESOURCE_PATH RESOURCE_ROOT "/ui/indicator-armadito.ui"
 
+#if (!(GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 10))
+#error you need at least Gtk 3.10 to compile
+#endif
+
 struct a6o_indicator_app {
 	GtkApplication *gtk_app;
 	AppIndicator *indicator;
@@ -75,9 +79,13 @@ static AppIndicator *create_indicator(struct a6o_indicator_app *app, GtkWidget *
 {
 	AppIndicator *indicator;
 
-	indicator = app_indicator_new(INDICATOR_NAME, PROGRAM_NAME,
-				APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+	indicator = app_indicator_new_with_path(INDICATOR_NAME, PROGRAM_NAME ".svg",
+						APP_INDICATOR_CATEGORY_SYSTEM_SERVICES,
+						SVG_ICON_PATH);
 
+	app_indicator_set_icon_full(indicator,
+				SVG_ICON_PATH "/" PROGRAM_NAME ".svg",
+				INDICATOR_NAME);
 	app_indicator_set_menu(indicator, GTK_MENU(menu));
 	app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
 
@@ -99,7 +107,7 @@ static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 	if ((menu = get_menu(app, builder)) == NULL)
 		return;
 
-	app->indicator = create_indicator(app, GTK_MENU(menu));
+	app->indicator = create_indicator(app, menu);
 
 	g_object_unref (builder);
 
