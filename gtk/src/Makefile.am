@@ -40,6 +40,10 @@ indicator_armadito_SOURCES = \
 BUILT_SOURCES = $(nodist_indicator_armadito_SOURCES)
 CLEANFILES = $(nodist_indicator_armadito_SOURCES)
 
+UI_RESOURCES = \
+	$(top_srcdir)/resource/indicator-armadito.gresource.xml \
+	$(top_srcdir)/ui/indicator-armadito.ui
+
 GLIB_COMPILE_RESOURCES=glib-compile-resources --sourcedir=$(top_srcdir) --internal --c-name indicator_armadito
 
 resource.c: Makefile $(UI_RESOURCES)

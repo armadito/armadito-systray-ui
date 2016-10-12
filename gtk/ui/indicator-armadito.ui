@@ -1,37 +1,26 @@
 <?xml version="1.0" standalone="no"?>
 <!--*- mode: xml -*-->
 <interface>
-  <object class="GtkAboutDialog" id="aboutdialog1">
-    <property name="program-name" translatable="no">Armadito Systray</property>
-    <property name="logo-icon-name" translatable="no">armadito-systray</property>
-  </object>
-  <object class="GtkMenu" id="systray">
+  <object class="GtkMenu" id="indicator-menu">
     <child>
       <object class="GtkMenuItem" id="title">
         <property name="visible">1</property>
         <property name="label">Armadito AV</property>
-        <signal name="activate" handler="systray_title"/>
+        <signal name="activate" handler="indicator_title"/>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="status">
         <property name="visible">1</property>
         <property name="label">Status</property>
-        <signal name="activate" handler="systray_status"/>
+        <signal name="activate" handler="indicator_status"/>
       </object>
     </child>
     <child>
       <object class="GtkCheckMenuItem" id="toggle">
         <property name="visible">1</property>
         <property name="label">Toggle</property>
-        <signal name="activate" handler="systray_toggle"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="exit">
-        <property name="visible">1</property>
-        <property name="label" translatable="yes">Exit</property>
-        <signal name="activate" handler="systray_exit"/>
+        <signal name="activate" handler="indicator_toggle"/>
       </object>
     </child>
   </object>
