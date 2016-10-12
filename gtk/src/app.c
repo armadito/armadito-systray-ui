@@ -7,12 +7,14 @@
 #include "resource.h"
 
 #define APP_ID "org.armadito.indicator"
+#define INDICATOR_NAME "Armadito indicator"
 #define PROGRAM_NAME "indicator-armadito"
 #define RESOURCE_ROOT "/org/armadito/indicator"
 #define UI_RESOURCE_PATH RESOURCE_ROOT "/ui/indicator-armadito.ui"
 
 struct a6o_indicator_app {
 	GtkApplication *gtk_app;
+	AppIndicator *indicator;
 };
 
 static GResource *load_resource(struct a6o_indicator_app *app)
@@ -27,7 +29,7 @@ static GResource *load_resource(struct a6o_indicator_app *app)
 		return NULL;
 	}
 
-	g_message("Loaded resources");
+	g_debug("Loaded resources");
 
 	return resource;
 }
@@ -46,27 +48,58 @@ static GtkBuilder *get_builder(struct a6o_indicator_app *app)
 
 	gtk_builder_connect_signals(builder, app);
 
-	g_message("Loaded UI builder");
+	g_debug("Loaded UI builder");
 
 	return builder;
 }
 
-#if 0
-	GtkWidget *indicator_menu
-	indicator_menu = GTK_WIDGET(gtk_builder_get_object(builder, "indicator-menu"));
-#endif
+static GtkWidget *get_menu(struct a6o_indicator_app *app, GtkBuilder *builder)
+{
+	GtkWidget *menu;
+
+	menu = GTK_WIDGET(gtk_builder_get_object(builder, "indicator-menu"));
+
+	if (!menu) {
+		g_message("Failed to get indicator menu");
+		g_application_quit(G_APPLICATION(app->gtk_app));
+
+		return NULL;
+	}
+
+	g_debug("Loaded indicator menu");
+
+	return menu;
+}
+
+static AppIndicator *create_indicator(struct a6o_indicator_app *app, GtkWidget *menu)
+{
+	AppIndicator *indicator;
+
+	indicator = app_indicator_new(INDICATOR_NAME, PROGRAM_NAME,
+				APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+
+	app_indicator_set_menu(indicator, GTK_MENU(menu));
+	app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
+
+	return indicator;
+}
 
 static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 {
 	GResource *resource;
 	GtkBuilder *builder;
-	GtkWidget *indicator_menu;
+	GtkWidget *menu;
 
 	if ((resource = load_resource(app)) == NULL)
 		return;
 
 	if ((builder = get_builder(app)) == NULL)
 		return;
+
+	if ((menu = get_menu(app, builder)) == NULL)
+		return;
+
+	app->indicator = create_indicator(app, GTK_MENU(menu));
 
 	g_object_unref (builder);
 
