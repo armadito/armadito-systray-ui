@@ -63,6 +63,9 @@ if test "$HAVE_GIO2" = "no"; then
    AC_MSG_ERROR("cannot find glib gio library")
 fi
 
+# check for libnotify
+PKG_CHECK_MODULES(LIBNOTIFY, libnotify)
+
 # check for gtk
 AC_MSG_CHECKING(for Gtk required version)
 AC_MSG_RESULT($with_gtk)

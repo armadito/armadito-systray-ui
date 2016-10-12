@@ -27,6 +27,9 @@ indicator_armadito_LDADD+= $(APPINDICATOR_LIBS)
 endif
 endif
 
+indicator_armadito_CFLAGS+= $(LIBNOTIFY_CFLAGS)
+indicator_armadito_LDADD+= $(LIBNOTIFY_LIBS)
+
 nodist_indicator_armadito_SOURCES = \
 	resource.h \
 	resource.c

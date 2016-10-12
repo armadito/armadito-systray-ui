@@ -1,14 +1,19 @@
 #include <stdlib.h>
 #include <gio/gio.h>
 #include <gtk/gtk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libappindicator/app-indicator.h>
+#include <libnotify/notify.h>
 
 #include "app.h"
 #include "resource.h"
 
 #define APP_ID "org.armadito.indicator"
+#define NOTIFICATION_ID "notification-armadito"
 #define INDICATOR_NAME "Armadito indicator"
 #define PROGRAM_NAME "indicator-armadito"
+#define INDICATOR_ICON PROGRAM_NAME ".svg"
+#define ICON_FILE  SVG_ICON_PATH "/" PROGRAM_NAME ".svg"
 #define RESOURCE_ROOT "/org/armadito/indicator"
 #define UI_RESOURCE_PATH RESOURCE_ROOT "/ui/indicator-armadito.ui"
 
@@ -19,7 +24,10 @@
 struct a6o_indicator_app {
 	GtkApplication *gtk_app;
 	AppIndicator *indicator;
+	NotifyNotification *notification;
 };
+
+static void a6o_indicator_app_notify(struct a6o_indicator_app *app, const char *summary, const char *body);
 
 static GResource *load_resource(struct a6o_indicator_app *app)
 {
@@ -79,17 +87,34 @@ static AppIndicator *create_indicator(struct a6o_indicator_app *app, GtkWidget *
 {
 	AppIndicator *indicator;
 
-	indicator = app_indicator_new_with_path(INDICATOR_NAME, PROGRAM_NAME ".svg",
-						APP_INDICATOR_CATEGORY_SYSTEM_SERVICES,
-						SVG_ICON_PATH);
+	indicator = app_indicator_new(INDICATOR_NAME, INDICATOR_ICON, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
 
 	app_indicator_set_icon_full(indicator,
-				SVG_ICON_PATH "/" PROGRAM_NAME ".svg",
+				ICON_FILE,
 				INDICATOR_NAME);
 	app_indicator_set_menu(indicator, GTK_MENU(menu));
 	app_indicator_set_status(indicator, APP_INDICATOR_STATUS_ACTIVE);
 
 	return indicator;
+}
+
+
+static NotifyNotification *create_notification(const char *title)
+{
+	NotifyNotification *notification;
+	GdkPixbuf *pixbuf;
+
+	notification = notify_notification_new(title, "", NULL);
+	pixbuf = gdk_pixbuf_new_from_file(ICON_FILE, NULL);
+
+	if (pixbuf != NULL)
+		notify_notification_set_image_from_pixbuf(notification, pixbuf);
+	else
+		g_warning("cannot load pixbuf from %s", ICON_FILE);
+
+	g_debug("Notification: %s", title);
+
+	return notification;
 }
 
 static void a6o_indicator_app_init(struct a6o_indicator_app *app)
@@ -108,6 +133,8 @@ static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 		return;
 
 	app->indicator = create_indicator(app, menu);
+
+	app->notification = create_notification("Armadito");
 
 	g_object_unref (builder);
 
@@ -130,6 +157,8 @@ struct a6o_indicator_app *a6o_indicator_app_new(void)
 	struct a6o_indicator_app *app;
 	GApplicationFlags flags = G_APPLICATION_IS_SERVICE;
 
+	notify_init(PROGRAM_NAME);
+
 	app = malloc(sizeof(struct a6o_indicator_app));
 
 	app->gtk_app = gtk_application_new(APP_ID, flags);
@@ -147,17 +176,40 @@ struct a6o_indicator_app *a6o_indicator_app_new(void)
 
 G_MODULE_EXPORT void indicator_title(GtkAction *action, gpointer user_data)
 {
+	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
+
 	g_debug("indicator_title");
+
+	a6o_indicator_app_notify(app, "user-action", "title");
 }
 
 G_MODULE_EXPORT void indicator_toggle(GtkAction *action, gpointer user_data)
 {
+	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
+
 	g_debug("indicator_toggle");
+
+	a6o_indicator_app_notify(app, "user-action", "toggle");
 }
 
 G_MODULE_EXPORT void indicator_status(GtkAction *action, gpointer user_data)
 {
+	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
+
 	g_debug("indicator_status");
+
+	a6o_indicator_app_notify(app, "user-action", "status");
+}
+
+static void a6o_indicator_app_notify(struct a6o_indicator_app *app, const char *summary, const char *body)
+{
+	if (!notify_notification_update(app->notification, summary, body, NULL)) {
+		g_debug("cannot update notification");
+	}
+
+	if (!notify_notification_show(app->notification, NULL)) {
+		g_debug("cannot show notification");
+	}
 }
 
 int a6o_indicator_app_run(struct a6o_indicator_app *app)
