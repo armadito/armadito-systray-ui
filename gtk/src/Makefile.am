@@ -5,7 +5,7 @@ bin_PROGRAMS= indicator-armadito
 AM_CFLAGS= @GLIB2_CFLAGS@ @GMODULE2_CFLAGS@ @GIO2_CFLAGS@ 
 LIBS     = @GLIB2_LIBS@ @GMODULE2_LIBS@ @GIO2_LIBS@
 
-indicator_armadito_CFLAGS= $(AM_CFLAGS) -DSVG_ICON_PATH=\"$(datarootdir)/icons/hicolor/scalable/apps\" -DPROGRAMNAME_LOCALEDIR=\"${PROGRAMNAME_LOCALEDIR}\"
+indicator_armadito_CFLAGS= $(AM_CFLAGS) -DSVG_ICON_PATH=\"$(datarootdir)/icons/hicolor/scalable/apps\" -DINDICATOR_ARMADITO_LOCALEDIR=\"${datarootdir}/locale\"
 indicator_armadito_LDADD=
 if USE_GTK3
 indicator_armadito_CFLAGS+= $(GTK3_CFLAGS)

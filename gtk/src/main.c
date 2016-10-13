@@ -19,11 +19,21 @@ along with Armadito gui.  If not, see <http://www.gnu.org/licenses/>.
 
 ***/
 
+#include <glib/gi18n.h>
 #include "app.h"
+
+static void i18n_init(void)
+{
+	bindtextdomain(GETTEXT_PACKAGE, INDICATOR_ARMADITO_LOCALEDIR);
+	bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+	textdomain(GETTEXT_PACKAGE);
+}
 
 int main(int argc, char **argv)
 {
 	struct a6o_indicator_app *indicator_app;
+
+	i18n_init();
 
 	indicator_app = a6o_indicator_app_new();
 

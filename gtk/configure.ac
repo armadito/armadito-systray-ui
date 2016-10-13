@@ -153,10 +153,9 @@ AM_CONDITIONAL([USE_APPINDICATOR], [test "$appindicator_version" = "appindicator
 
 # i18n
 IT_PROG_INTLTOOL([0.35.0])
-GETTEXT_PACKAGE=indicator-armadito
-AC_SUBST(GETTEXT_PACKAGE)
+GETTEXT_PACKAGE="$PACKAGE_NAME"
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [gettext package])
-##AC_DEFINE_PATH(GNOMELOCALEDIR, "${datadir}/locale", [locale directory])
+AC_SUBST(GETTEXT_PACKAGE)
 AM_GLIB_GNU_GETTEXT
 
 # Output files
@@ -164,7 +163,7 @@ AC_CONFIG_FILES([
 Makefile
 icons/Makefile
 icons/scalable/Makefile
-src/Makefile
 po/Makefile.in
+src/Makefile
 ])
 AC_OUTPUT
