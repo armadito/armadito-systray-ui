@@ -5,21 +5,21 @@
     <child>
       <object class="GtkMenuItem" id="title">
         <property name="visible">1</property>
-        <property name="label">Armadito AV</property>
+        <property name="label" translatable="yes">Armadito AV</property>
         <signal name="activate" handler="indicator_title"/>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="status">
         <property name="visible">1</property>
-        <property name="label">Status</property>
+        <property name="label" translatable="yes">Status</property>
         <signal name="activate" handler="indicator_status"/>
       </object>
     </child>
     <child>
       <object class="GtkCheckMenuItem" id="toggle">
         <property name="visible">1</property>
-        <property name="label">Toggle</property>
+        <property name="label" translatable="yes">Toggle</property>
         <signal name="activate" handler="indicator_toggle"/>
       </object>
     </child>

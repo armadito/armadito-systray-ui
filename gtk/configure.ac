@@ -1,6 +1,7 @@
 AC_INIT(indicator-armadito, 0.12.0-exp, armadito-av-dev@gna.org,, https://github.com/armadito/armadito-gui)
 
 AM_INIT_AUTOMAKE([foreign])
+AC_CONFIG_MACRO_DIR([m4])
 
 # collect arguments
 # debug
@@ -150,6 +151,13 @@ esac
 AM_CONDITIONAL([USE_APPINDICATOR_3], [test "$appindicator_version" = "appindicator3"])
 AM_CONDITIONAL([USE_APPINDICATOR], [test "$appindicator_version" = "appindicator"])
 
+# i18n
+IT_PROG_INTLTOOL([0.35.0])
+GETTEXT_PACKAGE=indicator-armadito
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [gettext package])
+##AC_DEFINE_PATH(GNOMELOCALEDIR, "${datadir}/locale", [locale directory])
+AM_GLIB_GNU_GETTEXT
 
 # Output files
 AC_CONFIG_FILES([
@@ -157,5 +165,6 @@ Makefile
 icons/Makefile
 icons/scalable/Makefile
 src/Makefile
+po/Makefile.in
 ])
 AC_OUTPUT

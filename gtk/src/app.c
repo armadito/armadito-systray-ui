@@ -4,6 +4,7 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libappindicator/app-indicator.h>
 #include <libnotify/notify.h>
+#include <glib/gi18n.h>
 
 #include "app.h"
 #include "resource.h"
@@ -183,15 +184,6 @@ G_MODULE_EXPORT void indicator_title(GtkAction *action, gpointer user_data)
 	a6o_indicator_app_notify(app, "user-action", "title");
 }
 
-G_MODULE_EXPORT void indicator_toggle(GtkAction *action, gpointer user_data)
-{
-	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
-
-	g_debug("indicator_toggle");
-
-	a6o_indicator_app_notify(app, "user-action", "toggle");
-}
-
 G_MODULE_EXPORT void indicator_status(GtkAction *action, gpointer user_data)
 {
 	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
@@ -199,6 +191,15 @@ G_MODULE_EXPORT void indicator_status(GtkAction *action, gpointer user_data)
 	g_debug("indicator_status");
 
 	a6o_indicator_app_notify(app, "user-action", "status");
+}
+
+G_MODULE_EXPORT void indicator_toggle(GtkAction *action, gpointer user_data)
+{
+	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
+
+	g_debug("indicator_toggle");
+
+	a6o_indicator_app_notify(app, "user-action", "toggle");
 }
 
 static void a6o_indicator_app_notify(struct a6o_indicator_app *app, const char *summary, const char *body)

@@ -1,3 +1,6 @@
 compile
 ltmain.sh
 depcomp
+config.rpath
+ABOUT-NLS
+m4/
