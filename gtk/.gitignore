@@ -1,6 +1,9 @@
 compile
 ltmain.sh
 depcomp
-config.rpath
-ABOUT-NLS
 m4/
+intltool-extract.in
+intltool-merge.in
+intltool-update.in
+po/Makefile.in.in
+po/*.mo
