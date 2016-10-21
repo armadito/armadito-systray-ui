@@ -1,0 +1,42 @@
+language: C
+sudo: required
+dist: trusty
+addons:
+  apt:
+    packages:
+    - libtool
+    - libglib2.0-dev
+    - libjson-c-dev
+    - libcurl4-openssl-dev
+    - gnome-common
+    - libnotify-dev
+    - libgtk-3-dev
+    - libappindicator3-dev
+  coverity_scan:
+    project:
+      name: armadito/armadito-systray-ui
+      description: Build submitted via Travis CI
+    notification_email: vhamon@teclib.com
+    build_command_prepend: "./configure; make clean"
+    build_command: make -j 4
+    branch_pattern: coverity_scan
+  sonarqube: true
+
+env:
+  global:
+  - secure: "SPRNbsQfTMN8qXNl2L9ZAonGi1fUWKy3wax0QJPPJ59V8P+swosD5YjiEbHV8i76sEogPuFyotDcoyzH9sUb7xvTlm9UCG5uJWj1kspSNHWQPkPVF0xqG90LRuvK9aU7iOBVDre+BM7DGEVXESWr4YEPCwPMiu590mlzOS2mqzErSXuWFgmUqijcYjbf7d5DaquWBU8JqbtsbX5PvDqJU5WpHu4PyGvk8ky2gVEb+3U+gzX4k/zQ3Gk8nhifO7cv2ADx2g2kt6xCvaNbOk7LaYzMlTqMeU+W4UQBLHqYdTkHqBBqNw4dXCoQlciE+83enRrvhmr0mCfk19BDMOl6yXhWDw1ye486lYUlT1qn+tymwaNSzYFQijWM+hZXUuVYCtHe85cx7qlr3gxOWhCVp5Q4GRUWfOWCSyklmDbnpOkgPW3uurbgjuf+zZ0IvZMsVLEOQTM5KgT20AtgdLYMHDlDfzdaOVckYxV2DQagHTPygCMr9uoaP3/0ffpxugjC8G3DdIhqLBMPHZef/N2auSjKrgR+FlTj6W98rIDIfxAPTFDe9E+JJ2funGn2UsTkjK1o/j/2BMdWqBDXdlxS+RhvHj9sHB7usGbn/xD6ElevNyJlbeyd2/3mnH1TE8ZSmmYeFVYPZmbi6lqpz9CbQFutLTO4Zo3tHyIxiTflmWU="
+
+before_install:
+- echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END
+  CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+compiler:
+- gcc
+
+before_script:
+- "./autogen.sh"
+
+script:
+- ./configure
+- make clean all
+- sonar-scanner -e -X -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
