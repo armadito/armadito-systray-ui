@@ -34,6 +34,7 @@ compiler:
 - gcc
 
 before_script:
+- cd gtk
 - "./autogen.sh"
 
 script:
