@@ -1,6 +1,6 @@
 Armadito Systray UI
 ===================
-[![Build Status](https://travis-ci.org/armadito/armadito-gui.svg?branch=DEV)](https://travis-ci.org/armadito/armadito-gui)
+[![Build Status](https://travis-ci.org/armadito/armadito-systray-ui.svg?branch=DEV)](https://travis-ci.org/armadito/armadito-systray-ui)
 <a href="https://scan.coverity.com/projects/armadito-armadito-gui">
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/10497/badge.svg"/>
