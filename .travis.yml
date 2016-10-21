@@ -40,4 +40,5 @@ before_script:
 script:
 - ./configure
 - make clean all
+- cd ../
 - sonar-scanner -e -X -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
