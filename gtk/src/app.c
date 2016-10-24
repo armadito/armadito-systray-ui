@@ -103,7 +103,6 @@ static NotifyNotification *create_notification(const char *title)
 
 static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 {
-	GResource *resource;
 	GtkBuilder *builder;
 	GtkWidget *menu;
 
