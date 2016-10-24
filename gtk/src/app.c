@@ -129,7 +129,7 @@ static void startup_cb(GApplication *g_app, gpointer user_data)
 
 static void shutdown_cb(GApplication *g_app, gpointer user_data)
 {
-	struct a6o_indicator_app *app = (struct a6o_indicator_app *)user_data;
+	return;
 }
 
 struct a6o_indicator_app *a6o_indicator_app_new(void)
