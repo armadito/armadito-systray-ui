@@ -5,6 +5,7 @@ Armadito Systray UI
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/10621/badge.svg"/>
 </a>
+[![Quality Gate](http://sonarqube.com/api/badges/gate?key=armadito:systray-ui)](http://sonarqube.com/dashboard/index/armadito:systray-ui)
 
 Armadito systray UI is the Armadito antivirus' notification area integration.
 
