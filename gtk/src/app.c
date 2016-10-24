@@ -30,23 +30,6 @@ struct a6o_indicator_app {
 
 static void a6o_indicator_app_notify(struct a6o_indicator_app *app, const char *summary, const char *body);
 
-static GResource *load_resource(struct a6o_indicator_app *app)
-{
-	GResource *resource;
-
-	resource = indicator_armadito_get_resource();
-	if (!resource) {
-		g_message("Failed to load resources");
-		g_application_quit(G_APPLICATION(app->gtk_app));
-
-		return NULL;
-	}
-
-	g_debug("Loaded resources");
-
-	return resource;
-}
-
 static GtkBuilder *get_builder(struct a6o_indicator_app *app)
 {
 	GtkBuilder *builder;
@@ -123,9 +106,6 @@ static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 	GResource *resource;
 	GtkBuilder *builder;
 	GtkWidget *menu;
-
-	if ((resource = load_resource(app)) == NULL)
-		return;
 
 	if ((builder = get_builder(app)) == NULL)
 		return;
