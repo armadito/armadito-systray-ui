@@ -67,7 +67,7 @@ static GtkWidget *get_menu(struct a6o_indicator_app *app, GtkBuilder *builder)
 	return menu;
 }
 
-static AppIndicator *create_indicator(struct a6o_indicator_app *app, GtkWidget *menu)
+static AppIndicator *create_indicator(GtkWidget *menu)
 {
 	AppIndicator *indicator;
 
@@ -113,7 +113,7 @@ static void a6o_indicator_app_init(struct a6o_indicator_app *app)
 	if ((menu = get_menu(app, builder)) == NULL)
 		return;
 
-	app->indicator = create_indicator(app, menu);
+	app->indicator = create_indicator(menu);
 
 	app->notification = create_notification("Armadito");
 
