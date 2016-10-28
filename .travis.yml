@@ -39,7 +39,7 @@ compiler:
 
 before_script:
 - cd gtk
-- "./autogen.sh"
+- ./autogen.sh
 
 script:
 - ./configure
