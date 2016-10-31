@@ -29,7 +29,7 @@ static void i18n_init(void)
 	textdomain(GETTEXT_PACKAGE);
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	struct a6o_indicator_app *indicator_app;
 
