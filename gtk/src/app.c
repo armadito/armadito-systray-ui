@@ -13,8 +13,8 @@
 #define NOTIFICATION_ID "notification-armadito"
 #define INDICATOR_NAME "Armadito indicator"
 #define PROGRAM_NAME "indicator-armadito"
-#define INDICATOR_ICON PROGRAM_NAME ".svg"
-#define ICON_FILE  SVG_ICON_PATH "/" PROGRAM_NAME ".svg"
+#define INDICATOR_ICON "indicator-armadito-dark2016.svg"
+#define ICON_FILE  SVG_ICON_PATH "/" INDICATOR_ICON
 #define RESOURCE_ROOT "/org/armadito/indicator"
 #define UI_RESOURCE_PATH RESOURCE_ROOT "/ui/indicator-armadito.ui"
 
