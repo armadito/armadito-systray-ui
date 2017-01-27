@@ -24,8 +24,6 @@ import locale
 from gettext import gettext as _
 
 APPINDICATOR_ID = 'indicator-armadito'
-#IMAGE_FILE = '/home/fdechelle/projects/armadito/git/armadito-gui/web/app/images/armadito-systray.png'
-IMAGE_FILE = '/home/fdechelle/Téléchargements/RefonteLogo04-icon.png'
 
 class ArmaditoIndicator(object):
     def __init__(self):
@@ -35,9 +33,11 @@ class ArmaditoIndicator(object):
 
     def indicator_init(self, menu):
         self.indicator = appindicator.Indicator.new(APPINDICATOR_ID,
-                                                    os.path.abspath(IMAGE_FILE),
+                                                    'indicator-armadito-dark',
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
+        self.indicator.set_icon_theme_path("/usr/share/icons")
+        self.indicator.set_icon('indicator-armadito-dark')
         self.indicator.set_menu(menu)
 
     def build_menu(self):
@@ -51,8 +51,8 @@ class ArmaditoIndicator(object):
     def notify_init(self):
         notify.init(APPINDICATOR_ID)
         self.notification = notify.Notification.new("Alert!")
-        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
-        self.notification.set_image_from_pixbuf(image)
+#        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
+#        self.notification.set_image_from_pixbuf(image)
 
     def welcome(self):
         self.messagedialog = gtk.MessageDialog(parent=None, type=gtk.MessageType.WARNING, buttons=gtk.ButtonsType.OK, message_format=_("launching the sausage-rat..."))
