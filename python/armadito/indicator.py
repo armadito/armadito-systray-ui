@@ -1,6 +1,6 @@
-# Copyright (C) 2016 Teclib'
+# Copyright (C) 2016-2017 Teclib'
 
-# This file is part of Armadito.
+# This file is part of Armadito indicator.
 
 # Armadito indicator is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Armadito module clamav.  If not, see <http://www.gnu.org/licenses/>.
+# along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from gi.repository import Gtk as gtk
@@ -23,8 +23,6 @@ from gi.repository import GdkPixbuf as gdkpixbuf
 import locale
 from gettext import gettext as _
 
-APPINDICATOR_ID = 'indicator-armadito'
-
 class ArmaditoIndicator(object):
     def __init__(self):
         self.indicator_init(self.build_menu())
@@ -32,7 +30,7 @@ class ArmaditoIndicator(object):
         #self.welcome()
 
     def indicator_init(self, menu):
-        self.indicator = appindicator.Indicator.new(APPINDICATOR_ID,
+        self.indicator = appindicator.Indicator.new('indicator-armadito',
                                                     'indicator-armadito-dark',
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)

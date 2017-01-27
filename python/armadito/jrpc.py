@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-
-# Copyright (C) 2016, 2017 Teclib'
+# Copyright (C) 2016-2017 Teclib'
 
 # This file is part of Armadito indicator.
 
@@ -17,16 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
-from armadito import indicator
-from gi.repository import Gtk as gtk
-import gettext
-from gettext import gettext as _
+import json
 
-gettext.textdomain('indicator-armadito')
+class Connection(object):
+    pass
 
-if __name__ == "__main__":
-    import signal
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    print(_("indicator-armadito (C) Teclib' 2016"));
-    i = indicator.ArmaditoIndicator()
-    gtk.main()
