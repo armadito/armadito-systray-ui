@@ -23,6 +23,8 @@ from gi.repository import GdkPixbuf as gdkpixbuf
 import locale
 from gettext import gettext as _
 
+INDICATOR_ID='indicator-armadito'
+
 class ArmaditoIndicator(object):
     def __init__(self):
         self.indicator_init(self.build_menu())
@@ -30,7 +32,7 @@ class ArmaditoIndicator(object):
         #self.welcome()
 
     def indicator_init(self, menu):
-        self.indicator = appindicator.Indicator.new('indicator-armadito',
+        self.indicator = appindicator.Indicator.new(INDICATOR_ID,
                                                     'indicator-armadito-dark',
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
@@ -47,7 +49,7 @@ class ArmaditoIndicator(object):
         return menu
 
     def notify_init(self):
-        notify.init(APPINDICATOR_ID)
+        notify.init(INDICATOR_ID)
         self.notification = notify.Notification.new("Alert!")
 #        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
 #        self.notification.set_image_from_pixbuf(image)

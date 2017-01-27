@@ -16,7 +16,26 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import socket
+import gobject
+from gi.repository import GObject as gobject
+
+def on_message_received(source, cb_condition, conn):
+    buff = conn.sock.recv(4096)
+    print(buff)
+    return True
 
 class Connection(object):
-    pass
+    def __init__(self, sock_path):
+        self.sock_path = sock_path
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_SEQPACKET)
+        self.sock.settimeout(10)
 
+    def connect(self):
+        try:
+            self.sock.connect(self.sock_path)
+        except socket.timeout as e:
+            print(str(e))
+            pass
+        gobject.io_add_watch(self.sock.fileno(), gobject.IO_IN, on_message_received, self)
+    

@@ -18,6 +18,7 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 from armadito import indicator
+from armadito import jrpc
 from gi.repository import Gtk as gtk
 import gettext
 from gettext import gettext as _
@@ -29,4 +30,6 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     print(_("indicator-armadito (C) Teclib' 2016"));
     i = indicator.ArmaditoIndicator()
+    c = jrpc.Connection('/tmp/.armadito-daemon')
+    c.connect()
     gtk.main()
