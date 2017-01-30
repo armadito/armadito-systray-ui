@@ -65,8 +65,9 @@ class ArmaditoIndicator(object):
         print("activated %s" % (str(menu_item), ))
         menu_item.toggled()
 
-    def notify(self):
-        self.notification.update(_("<b>Yes!</b>"), _("sausage-rat put into orbit successfully!!!"))
+    def notify(self, msg):
+#        self.notification.update(_("<b>Yes!</b>"), _("sausage-rat put into orbit successfully!!!"))
+        self.notification.update(_("<b>notify!</b>"), _(msg))
         self.notification.show()
 
     def welcome_response(self, widget, response_id):

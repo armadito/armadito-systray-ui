@@ -20,10 +20,32 @@ import socket
 import gobject
 from gi.repository import GObject as gobject
 
+# TODO
+# * close socket and remove watch on error
+# * implement mapper
+# * implement notification handling
+
 def on_message_received(source, cb_condition, conn):
     buff = conn.sock.recv(4096)
-    print(buff)
+    j_buff = buff.decode('utf-8')
+    print(j_buff)
+    d = json.loads(j_buff)
+    jrpc_obj = unmarshall(d)
+    conn.dispatch(jrpc_obj)
     return True
+
+class MarshallObject(object):
+    pass
+
+def unmarshall(j_obj):
+    o = MarshallObject()
+    for k, v in j_obj.items():
+        if type(v) is str or type(v) is int:
+            setattr(o, k, v)
+        elif type(v) is dict:
+            setattr(o, k, unmarshall(v))
+        # must handle the array case
+    return o
 
 class Connection(object):
     def __init__(self, sock_path):
@@ -38,4 +60,17 @@ class Connection(object):
             print(str(e))
             pass
         gobject.io_add_watch(self.sock.fileno(), gobject.IO_IN, on_message_received, self)
-    
+
+    def map(self, m):
+        self.mapper = m
+
+    def dispatch(self, jrpc_obj):
+        fun = self.mapper[jrpc_obj.method]
+        if fun is not None:
+            fun(jrpc_obj.params)
+
+    def scan(self):
+        p = {'root_path':'/home/fdechelle/Bureau/MalwareStore/EICAR/','send_progress':1}
+        d = {'id':1,'params':p,'jsonrpc':'2.0','method':'scan'}
+        buff = json.dumps(d).encode('utf-8')
+        self.sock.send(buff)
