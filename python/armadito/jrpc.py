@@ -17,7 +17,6 @@
 
 import json
 import socket
-import gobject
 from gi.repository import GObject as gobject
 
 # TODO
@@ -26,12 +25,10 @@ from gi.repository import GObject as gobject
 # * implement notification handling
 
 def on_message_received(source, cb_condition, conn):
-    buff = conn.sock.recv(4096)
-    j_buff = buff.decode('utf-8')
-    print(j_buff)
-    d = json.loads(j_buff)
-    jrpc_obj = unmarshall(d)
-    conn.dispatch(jrpc_obj)
+    if cb_condition == gobject.IO_ERR:
+        conn.process_error()
+    else:
+        conn.process_data()
     return True
 
 class MarshallObject(object):
@@ -52,15 +49,52 @@ class Connection(object):
         self.sock_path = sock_path
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_SEQPACKET)
         self.sock.settimeout(10)
+        self.change_fun = None
+        self.connected = False
+        self.watch_id = None
+        self.timeout_id = None
+
+    def on_change(self, fun):
+        self.change_fun = fun
 
     def connect(self):
         try:
             self.sock.connect(self.sock_path)
-        except socket.timeout as e:
+#        except socket.timeout as e:
+        except OSError as e:
             print(str(e))
-            pass
-        gobject.io_add_watch(self.sock.fileno(), gobject.IO_IN, on_message_received, self)
+            self.process_error()
+            return
+        self.watch_id = gobject.io_add_watch(self.sock.fileno(), gobject.IO_IN | gobject.IO_ERR, on_message_received, self)
+        if self.connected is False:
+            self.connected = True
+            if self.change_fun is not None:
+                self.change_fun(self.connected)
 
+    def process_error(self):
+        if self.connected:
+            self.connected = False
+            self.watch_id = None
+            if self.change_fun is not None:
+                self.change_fun(self.connected)
+        if self.timeout_id is None:
+            self.timeout_id = gobject.timeout_add(1000, self.on_timeout)
+
+    def on_timeout(self):
+        self.connect()
+        if self.connected:
+            self.timeout_id = None
+            return False
+        return True
+
+    def process_data(self):
+        buff = self.sock.recv(4096)
+        j_buff = buff.decode('utf-8')
+        print(j_buff)
+        d = json.loads(j_buff)
+        jrpc_obj = unmarshall(d)
+        self.dispatch(jrpc_obj)
+        
     def map(self, m):
         self.mapper = m
 

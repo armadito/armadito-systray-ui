@@ -16,6 +16,7 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from armadito import jrpc
 from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
@@ -29,7 +30,20 @@ class ArmaditoIndicator(object):
     def __init__(self):
         self.indicator_init(self.build_menu())
         self.notify_init()
+        self.jrpc = jrpc.Connection('/tmp/.armadito-daemon')
+        self.jrpc.on_change(self.on_connection_change)
+        self.jrpc.connect()
+#    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
+#c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
+    
         #self.welcome()
+
+    def on_connection_change(self, connected):
+        print("connected:", connected)
+        if connected:
+            self.indicator.set_icon('indicator-armadito-dark')
+        else:
+            self.indicator.set_icon('indicator-armadito')
 
     def indicator_init(self, menu):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
@@ -37,7 +51,8 @@ class ArmaditoIndicator(object):
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.indicator.set_icon_theme_path("/usr/share/icons")
-        self.indicator.set_icon('indicator-armadito-dark')
+#        self.indicator.set_icon('indicator-armadito-dark')
+        self.indicator.set_icon('indicator-armadito')
         self.indicator.set_menu(menu)
 
     def build_menu(self):
