@@ -25,7 +25,7 @@ from gi.repository import GObject as gobject
 # * implement notification handling
 
 def on_message_received(source, cb_condition, conn):
-    if cb_condition == gobject.IO_ERR:
+    if cb_condition & gobject.IO_ERR:
         conn.process_error()
     else:
         conn.process_data()
@@ -46,11 +46,10 @@ def unmarshall(j_obj):
 
 class Connection(object):
     def __init__(self, sock_path):
+        self.sock = None
         self.sock_path = sock_path
-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_SEQPACKET)
-        self.sock.settimeout(10)
-        self.change_fun = None
         self.connected = False
+        self.change_fun = None
         self.watch_id = None
         self.timeout_id = None
 
@@ -59,8 +58,9 @@ class Connection(object):
 
     def connect(self):
         try:
+            self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_SEQPACKET)
+            self.sock.settimeout(10)
             self.sock.connect(self.sock_path)
-#        except socket.timeout as e:
         except OSError as e:
             print(str(e))
             self.process_error()
@@ -73,6 +73,8 @@ class Connection(object):
 
     def process_error(self):
         if self.connected:
+            self.sock.close()
+            self.sock = None
             self.connected = False
             self.watch_id = None
             if self.change_fun is not None:
@@ -90,7 +92,10 @@ class Connection(object):
     def process_data(self):
         buff = self.sock.recv(4096)
         j_buff = buff.decode('utf-8')
-        print(j_buff)
+        print('>>%s<<' % (j_buff,))
+        if len(j_buff) == 0:
+            self.process_error()
+            return
         d = json.loads(j_buff)
         jrpc_obj = unmarshall(d)
         self.dispatch(jrpc_obj)
