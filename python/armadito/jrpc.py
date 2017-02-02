@@ -35,14 +35,33 @@ class MarshallObject(object):
     pass
 
 def unmarshall(j_obj):
-    o = MarshallObject()
-    for k, v in j_obj.items():
-        if type(v) is str or type(v) is int:
-            setattr(o, k, v)
-        elif type(v) is dict:
+    if type(j_obj) is str or type(j_obj) is int:
+        return j_obj
+    elif type(j_obj) is dict:
+        o = MarshallObject()
+        for k, v in j_obj.items():
             setattr(o, k, unmarshall(v))
-        # must handle the array case
-    return o
+        return o
+    elif type(j_obj) is list:
+        l = []
+        for i in j_obj:
+            l.append(unmarshall(i))
+        return l
+
+def marshall(obj):
+    if type(obj) is str or type(obj) is int:
+        return obj
+    elif type(obj) is list:
+        l = []
+        for i in obj:
+            l.append(marshall(i))
+        return l
+    elif isinstance(obj, object):
+        d = {}
+        for a in dir(obj):
+            if not '__' in a:
+                d[a] = marshall(getattr(obj, a))
+        return d
 
 class Connection(object):
     def __init__(self, sock_path):
@@ -93,7 +112,6 @@ class Connection(object):
     def process_data(self):
         buff = self.sock.recv(4096)
         j_buff = buff.decode('utf-8')
-        print('>>%s<<' % (j_buff,))
         if len(j_buff) == 0:
             self.process_error()
             return
@@ -104,10 +122,14 @@ class Connection(object):
     def map(self, m):
         self.mapper = m
 
-    def dispatch(self, jrpc_obj):
+    def dispatch_request(self, jrpc_obj):
         fun = self.mapper[jrpc_obj.method]
         if fun is not None:
             fun(jrpc_obj.params)
+
+    def dispatch(self, jrpc_obj):
+        if is_request(jrpc_obj):
+            dispatch_request(jrpc_obj)
 
     def scan(self):
         p = {'root_path':'/home/fdechelle/Bureau/MalwareStore/EICAR/','send_progress':1}

@@ -3,6 +3,7 @@
 
 import os
 from setuptools import setup
+#from babel.messages import frontend as babel
 
 def read(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()

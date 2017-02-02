@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2017-02-02 17:01+0100\n"
+"PO-Revision-Date: 2017-02-02 17:03+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: armadito/indicator.py:70 build/lib/armadito/indicator.py:70
+msgid "Armadito: version x.y.x"
+msgstr ""
+
+#: armadito/indicator.py:72 build/lib/armadito/indicator.py:72
+msgid "Latest bases update: 01/01/1970 00:00"
+msgstr ""
+
+#: armadito/indicator.py:75 build/lib/armadito/indicator.py:75
+msgid "Open Armadito web interface"
+msgstr ""
+
+#: armadito/indicator.py:78 build/lib/armadito/indicator.py:78
+msgid "Real-time protection"
+msgstr ""
+
+#: armadito/indicator.py:92 build/lib/armadito/indicator.py:92
+msgid "launching the sausage-rat..."
+msgstr ""
+
+#: armadito/indicator.py:107 build/lib/armadito/indicator.py:107
+msgid "<b>notify!</b>"
+msgstr ""

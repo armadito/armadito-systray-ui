@@ -26,9 +26,20 @@ from gettext import gettext as _
 
 INDICATOR_ID='indicator-armadito'
 
+# menu entries:
+# Armadito version x.y.z
+# Latest bases update: 01/01/1970 00:00
+# separator
+# Open Armadito web interface
+# Pause real-time protection
+# separator
+# Latest threats ???
+
+
+
 class ArmaditoIndicator(object):
     def __init__(self):
-        self.indicator_init(self.build_menu())
+        self.indicator_init()
         self.notify_init()
         self.jrpc = jrpc.Connection('/tmp/.armadito-daemon')
         self.jrpc.add_change_cb(self.on_connection_change)
@@ -45,21 +56,30 @@ class ArmaditoIndicator(object):
         else:
             self.indicator.set_icon('indicator-armadito')
 
-    def indicator_init(self, menu):
+    def indicator_init(self):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
                                                     'indicator-armadito-dark',
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.indicator.set_icon_theme_path("/usr/share/icons")
-#        self.indicator.set_icon('indicator-armadito-dark')
         self.indicator.set_icon('indicator-armadito')
-        self.indicator.set_menu(menu)
+        self.indicator.set_menu(self.build_menu())
 
     def build_menu(self):
         menu = gtk.Menu()
+        self.version_menu_item = gtk.MenuItem(_('Armadito: version ?.?.?'))
+        self.version_menu_item.set_sensitive(False)
+        menu.append(self.version_menu_item)
+        menu_item = gtk.MenuItem(_('Latest bases update: 01/01/1970 00:00'))
+        menu.append(menu_item)
+        menu.append(gtk.SeparatorMenuItem())
+        menu_item = gtk.MenuItem(_('Open Armadito web interface'))
+        menu_item.connect("activate", self.open_web_ui_menu_activated)
+        menu.append(menu_item)
         menu_item = gtk.CheckMenuItem.new_with_label(_('Real-time protection'))
         menu_item.connect("activate", self.rtprot_menu_activated)
         menu.append(menu_item)
+        menu.append(gtk.SeparatorMenuItem())
         menu.show_all()        
         return menu
 
@@ -75,6 +95,9 @@ class ArmaditoIndicator(object):
         self.messagedialog.set_icon(image)
         self.messagedialog.connect("response", self.welcome_response)
         self.messagedialog.show()
+
+    def open_web_ui_menu_activated(self, menu_item):
+        print("activated %s" % (str(menu_item), ))
 
     def rtprot_menu_activated(self, menu_item):
         print("activated %s" % (str(menu_item), ))
