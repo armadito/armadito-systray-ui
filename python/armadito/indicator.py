@@ -31,7 +31,7 @@ class ArmaditoIndicator(object):
         self.indicator_init(self.build_menu())
         self.notify_init()
         self.jrpc = jrpc.Connection('/tmp/.armadito-daemon')
-        self.jrpc.on_change(self.on_connection_change)
+        self.jrpc.add_change_cb(self.on_connection_change)
         self.jrpc.connect()
 #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
 #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })

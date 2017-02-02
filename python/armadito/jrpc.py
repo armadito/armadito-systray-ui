@@ -49,12 +49,12 @@ class Connection(object):
         self.sock = None
         self.sock_path = sock_path
         self.connected = False
-        self.change_fun = None
+        self.change_cb = None
         self.watch_id = None
         self.timeout_id = None
 
-    def on_change(self, fun):
-        self.change_fun = fun
+    def add_change_cb(self, cb):
+        self.change_cb = cb
 
     def connect(self):
         try:
@@ -63,13 +63,14 @@ class Connection(object):
             self.sock.connect(self.sock_path)
         except OSError as e:
             print(str(e))
+            self.sock = None
             self.process_error()
             return
         self.watch_id = gobject.io_add_watch(self.sock.fileno(), gobject.IO_IN | gobject.IO_ERR, on_message_received, self)
         if self.connected is False:
             self.connected = True
-            if self.change_fun is not None:
-                self.change_fun(self.connected)
+            if self.change_cb is not None:
+                self.change_cb(self.connected)
 
     def process_error(self):
         if self.connected:
@@ -77,8 +78,8 @@ class Connection(object):
             self.sock = None
             self.connected = False
             self.watch_id = None
-            if self.change_fun is not None:
-                self.change_fun(self.connected)
+            if self.change_cb is not None:
+                self.change_cb(self.connected)
         if self.timeout_id is None:
             self.timeout_id = gobject.timeout_add(1000, self.on_timeout)
 
