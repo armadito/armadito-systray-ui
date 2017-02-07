@@ -76,7 +76,7 @@ def marshall(val):
     elif isinstance(val, object):
         d = {}
         for attr in dir(val):
-            if not '__' in a:
+            if not '__' in attr:
                 d[attr] = marshall(getattr(val, attr))
         return d
     raise MarshallingError("invalid type: %s in JSON marshalling" % (str(t))) 
@@ -165,26 +165,25 @@ class Connection(object):
         return True
         
     def _process_request(self, jrpc_obj):
-        fun = self._mapper[jrpc_obj['method']]
-        if fun is None:
-            raise JsonRPCError('unknown method') 
-        try:
-            params = None
-            if 'params' in jrpc_obj:
-                params = unmarshall(jrpc_obj['params'])
+        method = jrpc_obj['method']
+        if not method in self._mapper:
+            raise JsonRPCError('no callable for method %s' % (method,))
+        fun = self._mapper[method]
+        params = None
+        if 'params' in jrpc_obj:
+            params = unmarshall(jrpc_obj['params'])
             fun(params)
-        except Exception as e:
-            raise JsonRPCError('method call failed', e)
+        else:
+            fun()
 
     def _process_response(self, jrpc_obj):
-        try:
-            id = jrpc_obj['id']
-            cb = self._response_callbacks[id]
-            result = unmarshall(jrpc_obj['result'])
-            cb(result)
-            del self._response_callbacks[id]
-        except KeyError as e:
-            raise e
+        id = jrpc_obj['id']
+        if not id in self._response_callbacks:
+            raise JsonRPCError('no callback for id %d' % (id,))
+        cb = self._response_callbacks[id]
+        del self._response_callbacks[id]
+        result = unmarshall(jrpc_obj['result'])
+        cb(result)
 
     def _dispatch(self, jrpc_obj):
         _basic_check(jrpc_obj)
@@ -192,6 +191,8 @@ class Connection(object):
             self._process_request(jrpc_obj)
         elif _is_response(jrpc_obj):
             self._process_response(jrpc_obj)
+        else:
+            raise JsonRPCError('not implemented JSON-RPC: %s' % (repr(jrpc_obj)))
 
     def _new_id(self):
         id = self._response_id
