@@ -21,6 +21,7 @@ from gi.repository import Gtk as gtk
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from gi.repository import GdkPixbuf as gdkpixbuf
+from gi.repository import GObject as gobject
 import locale
 from gettext import gettext as _
 
@@ -36,54 +37,75 @@ INDICATOR_ID='indicator-armadito'
 # Latest threats ???
 
 
-
 class ArmaditoIndicator(object):
     def __init__(self):
-        self.indicator_init()
-        self.notify_init()
-        self.jrpc = jrpc.Connection('/tmp/.armadito-daemon')
-        self.jrpc.set_change_cb(self.on_connection_change)
-        self.jrpc.connect()
-#    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
-#c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
-    
-        #self.welcome()
+        self._indicator_init()
+        self._notify_init()
+        self._connection_init()
 
-    def on_connection_change(self, connected):
+    def _on_timeout(self):
+        try:
+            self._conn.connect()
+        except OSError as e:
+            print(str(e))
+            return True
+        self._timeout_id = None
+        return False
+
+    def _start_timeout(self):
+            self._timeout_id = gobject.timeout_add(1000, self._on_timeout)
+
+    def _connection_listener(self, connected):
         print("connected:", connected)
         if connected:
             self.indicator.set_icon('indicator-armadito-dark')
         else:
             self.indicator.set_icon('indicator-armadito')
+            if self._connected is True:
+                self._start_timeout()
+        self._connected = connected
+        
+    def _connection_init(self):
+        self._connected = False
+        self._conn = jrpc.Connection('/tmp/.armadito-daemon')
+        #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
+        #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
+        self._timeout_id = None
+        self._conn.add_listener(self._connection_listener)
+        try:
+            self._conn.connect()
+        except OSError as e:
+            print(str(e))
+            self._start_timeout()
 
-    def indicator_init(self):
+    def _indicator_init(self):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
                                                     'indicator-armadito-dark',
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.indicator.set_icon_theme_path("/usr/share/icons")
         self.indicator.set_icon('indicator-armadito')
-        self.indicator.set_menu(self.build_menu())
+        self.indicator.set_menu(self._build_menu())
 
-    def build_menu(self):
+    def _build_menu(self):
         menu = gtk.Menu()
-        self.version_menu_item = gtk.MenuItem(_('Armadito: version ?.?.?'))
+        self.version_menu_item = gtk.MenuItem(_('Armadito: version %s'))
         self.version_menu_item.set_sensitive(False)
         menu.append(self.version_menu_item)
-        menu_item = gtk.MenuItem(_('Latest bases update: 01/01/1970 00:00'))
+        menu_item = gtk.MenuItem(_('Latest bases update: %s'))
         menu.append(menu_item)
         menu.append(gtk.SeparatorMenuItem())
         menu_item = gtk.MenuItem(_('Open Armadito web interface'))
-        menu_item.connect("activate", self.open_web_ui_menu_activated)
+        menu_item.connect("activate", self._open_web_ui_menu_activated)
         menu.append(menu_item)
         menu_item = gtk.CheckMenuItem.new_with_label(_('Real-time protection'))
-        menu_item.connect("activate", self.rtprot_menu_activated)
+        menu_item.connect("activate", self._rtprot_menu_activated)
         menu.append(menu_item)
         menu.append(gtk.SeparatorMenuItem())
         menu.show_all()        
         return menu
 
-    def notify_init(self):
+    def _notify_init(self):
         notify.init(INDICATOR_ID)
         self.notification = notify.Notification.new("Alert!")
 #        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
@@ -96,10 +118,10 @@ class ArmaditoIndicator(object):
         self.messagedialog.connect("response", self.welcome_response)
         self.messagedialog.show()
 
-    def open_web_ui_menu_activated(self, menu_item):
+    def _open_web_ui_menu_activated(self, menu_item):
         print("activated %s" % (str(menu_item), ))
 
-    def rtprot_menu_activated(self, menu_item):
+    def _rtprot_menu_activated(self, menu_item):
         print("activated %s" % (str(menu_item), ))
         menu_item.toggled()
 

@@ -38,20 +38,20 @@ def unmarshall(j_val):
     int  -> int
     str  -> str
     """
-    tj = type(j_val)
-    if tj is str or tj is int:
+    t = type(j_val)
+    if t is str or t is int:
         return j_val
-    elif tj is dict:
+    elif t is dict:
         o = MarshallObject()
         for k, v in j_val.items():
             setattr(o, k, unmarshall(v))
         return o
-    elif tj is list:
+    elif t is list:
         l = []
         for item in j_val:
             l.append(unmarshall(item))
         return l
-    raise MarshallingError("invalid type: %s in JSON unmarshalling" % (str(tj))) 
+    raise MarshallingError("invalid type: %s in JSON unmarshalling" % (str(t))) 
 
 def marshall(val):
     """Marshall a python object into a JSON value
@@ -102,7 +102,7 @@ def _is_request(jrpc_obj):
     return 'method' in jrpc_obj and type(jrpc_obj['method']) is str
 
 def _is_response(jrpc_obj):
-    return 'result' in jrpc_obj and 'id' in jrpc_obj and 'error' not in jrpc_obj
+    return 'result' in jrpc_obj and 'id' in jrpc_obj and not 'error' in jrpc_obj
 
 class Connection(object):
     """JSON-RPC connection over a Unix socket
@@ -117,6 +117,7 @@ class Connection(object):
         self._sock = None
         self._sock_path = sock_path
         self._watch_id = None
+        self._connection_listeners = []
         self._response_id = 1
         self._response_callbacks = {}
         self._mapper = {}
@@ -125,9 +126,19 @@ class Connection(object):
         """maps incoming calls
         Arguments:
         method -- the 'method' in JSON-RPC request
-        fun    -- the callable to call when receivint a JSON-RPC request
+        fun    -- the callable to call when receiving a JSON-RPC request
         """
         self._mapper[method] = fun
+
+    def add_listener(self, listener):
+        self._connection_listeners.append(listener)
+
+    def remove_listener(self, listener):
+        self._connection_listeners.remove(listener)
+
+    def _notify_listeners(self, connected):
+        for listener in self._connection_listeners:
+            listener(connected)
 
     def connect(self):
         """connects to Unix socket and install file descriptor watch callback"""
@@ -135,14 +146,16 @@ class Connection(object):
             self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_SEQPACKET)
             self._sock.settimeout(10)
             self._sock.connect(self._sock_path)
-        except OSError as e:
+        except OSError:
             self._sock = None
             raise
         self._watch_id = gobject.io_add_watch(self._sock.fileno(), gobject.IO_IN | gobject.IO_ERR, _on_message_received, self)
+        self._notify_listeners(True)
 
     def _close(self):
         self._sock.close()
         self._sock = None
+        self._notify_listeners(False)
         self._watch_id = None
         
     def close(self):
