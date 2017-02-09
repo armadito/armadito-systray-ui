@@ -22,6 +22,7 @@ from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from gi.repository import GdkPixbuf as gdkpixbuf
 from gi.repository import GObject as gobject
+import datetime
 import locale
 from gettext import gettext as _
 
@@ -36,12 +37,21 @@ INDICATOR_ID='indicator-armadito'
 # separator
 # Latest threats ???
 
-
 class ArmaditoIndicator(object):
     def __init__(self):
+        self._antivirus_version = '<unknown>'
+        self._update_date = '<unknown>'
         self._indicator_init()
         self._notify_init()
         self._connection_init()
+        if self._connected:
+            self._conn.call("status", callback = self._on_status)
+
+    def _on_status(self, info):
+        self._antivirus_version = info.antivirus_version
+        self._version_menu_item.set_label(_('Armadito: version %s') % (self._antivirus_version,))
+        self._update_date = datetime.datetime.fromtimestamp(info.global_update_ts).strftime('%x %X')
+        self._update_date_menu_item.set_label(_('Latest bases update: %s') % (self._update_date))
 
     def _on_timeout(self):
         try:
@@ -89,11 +99,12 @@ class ArmaditoIndicator(object):
 
     def _build_menu(self):
         menu = gtk.Menu()
-        self.version_menu_item = gtk.MenuItem(_('Armadito: version %s'))
-        self.version_menu_item.set_sensitive(False)
-        menu.append(self.version_menu_item)
-        menu_item = gtk.MenuItem(_('Latest bases update: %s'))
-        menu.append(menu_item)
+        self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._antivirus_version,))
+        self._version_menu_item.set_sensitive(False)
+        menu.append(self._version_menu_item)
+        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % (self._update_date))
+        self._update_date_menu_item.set_sensitive(False)
+        menu.append(self._update_date_menu_item)
         menu.append(gtk.SeparatorMenuItem())
         menu_item = gtk.MenuItem(_('Open Armadito web interface'))
         menu_item.connect("activate", self._open_web_ui_menu_activated)
