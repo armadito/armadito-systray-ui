@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+#
+# to combine autotools and setuptools, see:
+# https://blog.kevin-brown.com/programming/2014/09/24/combining-autotools-and-setuptools.html
 
 import os
 from setuptools import setup

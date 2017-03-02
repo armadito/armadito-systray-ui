@@ -11,8 +11,11 @@ all-local:
 	)
 
 install-exec-local:
-	$(PYTHON) $(srcdir)/setup.py install \
-		--prefix $(DESTDIR)$(prefix) \
-		--single-version-externally-managed \
-		--record $(DESTDIR)$(pkgpythondir)/install_files.txt \
-		--verbose
+	(\
+		cd $(srcdir) ; \
+		$(PYTHON) setup.py install \
+			--prefix $(DESTDIR)$(prefix) \
+			--single-version-externally-managed \
+			--record /dev/null \
+			--verbose ; \
+	)
