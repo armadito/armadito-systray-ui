@@ -1,6 +1,5 @@
 Makefile.in
 aclocal.m4
-autogen.sh
 autom4te.cache/
 configure
 install-sh
