@@ -3,6 +3,7 @@
 #
 # to combine autotools and setuptools, see:
 # https://blog.kevin-brown.com/programming/2014/09/24/combining-autotools-and-setuptools.html
+# Thank you!
 
 import os
 from setuptools import setup
@@ -20,7 +21,7 @@ setup(
     license = "GPLv3",
     keywords = "antivirus indicator",
     url = "https://github.com/armadito/armadito-systray-ui",
-    long_description=read('README.md'),
+    long_description = read('README.md'),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
