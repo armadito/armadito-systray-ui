@@ -16,7 +16,7 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from armadito import jrpc
+from armadito import jrpc, model
 from gi.repository import Gtk as gtk
 from gi.repository import Gio as gio
 from gi.repository import AppIndicator3 as appindicator

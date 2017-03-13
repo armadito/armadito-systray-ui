@@ -17,36 +17,40 @@
 
 from functools import wraps
 
-def notify(f):
+def notify_before(f):
+    @wraps(f)
+    def decorator(self, *args, **kwargs):
+        self.notify(self, f.__name__, *args, *kwargs)
+        retval = f(self, *args, **kwargs)
+        return retval
+    return decorator
+
+def notify_after(f):
     @wraps(f)
     def decorator(self, *args, **kwargs):
         retval = f(self, *args, **kwargs)
-        self.notify(f)
+        self.notify(self, f.__name__, retval)
         return retval
     return decorator
 
 class Notifier(object):
     def __init__(self):
-        self._listeners = {}
+        self._listener = None
 
-    def on(self, mth, fun):
-        self._listeners[mth.__name__] = fun
+    def listener(self, l):
+        self._listener = l
 
-    def notify(self, mth):
-        try:
-            fun = self._listeners[mth.__name__]
-        except KeyError:
-            pass
-        fun()
+    def notify(self, method_name, *args, **kwargs):
+        if self._listener is not None:
+            self._listener(method_name, *args, **kwargs)
 
 class AVModel(Notifier):
     def __init__(self):
-        super().__init__(self)
+        super().__init__()
 
-    @notify
-    def info(self, x):
-        self._a += x
-        return self._a
+    @notify_after
+    def status(self, info):
+        passs
 
 
 if __name__ == '__main__':
@@ -55,16 +59,33 @@ if __name__ == '__main__':
             super().__init__()
             self._count = 0
 
-        @notify
-        def inc(self, x):
-            self._count += x
+        @notify_after
+        def inc(self):
+            self._count += 1
+            return self._count
+
+        @notify_before
+        def dec(self, x):
+            self._count -= x
 
         @property
         def count(self):
             return self._count
 
     a1 = TestModel()
-    a1.on(a1.inc, lambda : print('lambda', a1.count))
-    a1.inc(2)
-    a1.inc(3)
+    a1.listener(lambda obj, method_name, *args, **kwargs: print(obj, method_name, *args, **kwargs))
+    a1.inc()
+    a1.inc()
+    a1.dec(10)
 
+    def foo(obj, method_name, *args, **kwargs):
+        if method_name == 'inc':
+            print('increment, result is', args[0])
+        else:
+            print('decrement by', args[0])
+
+    a2 = TestModel()
+    a2.listener(foo)
+    a2.inc()
+    a2.inc()
+    a2.dec(10)
