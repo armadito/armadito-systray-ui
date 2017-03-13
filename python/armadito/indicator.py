@@ -18,6 +18,7 @@
 import os
 from armadito import jrpc
 from gi.repository import Gtk as gtk
+from gi.repository import Gio as gio
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from gi.repository import GdkPixbuf as gdkpixbuf
@@ -70,14 +71,14 @@ class ArmaditoIndicator(object):
         if connected:
             self.indicator.set_icon('indicator-armadito-dark')
         else:
-            self.indicator.set_icon('indicator-armadito')
+            self.indicator.set_icon('indicator-armadito-missing')
             if self._connected is True:
                 self._start_timeout()
         self._connected = connected
         
     def _connection_init(self):
         self._connected = False
-        self._conn = jrpc.Connection('/tmp/.armadito-daemon')
+        self._conn = jrpc.Connection('\0/tmp/.armadito-daemon')
         #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
         #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
         self._timeout_id = None
@@ -95,9 +96,9 @@ class ArmaditoIndicator(object):
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         self.indicator.set_icon_theme_path("/usr/share/icons")
         self.indicator.set_icon('indicator-armadito')
-        self.indicator.set_menu(self._build_menu())
+        self.indicator.set_menu(self._build_menu_gtk())
 
-    def _build_menu(self):
+    def _build_menu_gtk(self):
         menu = gtk.Menu()
         self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._antivirus_version,))
         self._version_menu_item.set_sensitive(False)
@@ -106,41 +107,51 @@ class ArmaditoIndicator(object):
         self._update_date_menu_item.set_sensitive(False)
         menu.append(self._update_date_menu_item)
         menu.append(gtk.SeparatorMenuItem())
-        menu_item = gtk.MenuItem(_('Open Armadito web interface'))
-        menu_item.connect("activate", self._open_web_ui_menu_activated)
-        menu.append(menu_item)
         menu_item = gtk.CheckMenuItem.new_with_label(_('Real-time protection'))
         menu_item.connect("activate", self._rtprot_menu_activated)
         menu.append(menu_item)
-        menu.append(gtk.SeparatorMenuItem())
+        #menu.append(gtk.SeparatorMenuItem())
+        #menu_item = self._build_animated_menu_item()
+        #print(menu_item)
+        #menu.append(menu_item)
         menu.show_all()        
         return menu
 
+    # trial, does not work
+    def _build_animated_menu_item(self):
+        box = gtk.Box(gtk.Orientation.HORIZONTAL, 6)
+        #icon = gtk.Image.new_from_file('...')
+        # works only if you do:
+        #gsettings set org.gnome.desktop.interface menus-have-icons true
+        icon = gtk.Image.new_from_icon_name("folder-music-symbolic", gtk.IconSize.MENU)
+        print(icon)
+        label = gtk.Label('animated')
+        menu_item = gtk.MenuItem()
+        box.add(icon)
+        box.add(label)
+        menu_item.add(box)
+        menu_item.show_all()
+        return menu_item
+
+    def _build_menu_gio(self):
+        menu = gio.Menu()
+        section = gio.Menu()
+        section.append_item(gio.MenuItem.new(_('Armadito: version %s') % (self._antivirus_version,), None))
+        menu.append_section("foobar", section)
+        return menu
+        
+    # trial, does not work
     def _notify_init(self):
         notify.init(INDICATOR_ID)
-        self.notification = notify.Notification.new("Alert!")
+        self._notification = notify.Notification.new("Alert!")
 #        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
 #        self.notification.set_image_from_pixbuf(image)
-
-    def welcome(self):
-        self.messagedialog = gtk.MessageDialog(parent=None, type=gtk.MessageType.WARNING, buttons=gtk.ButtonsType.OK, message_format=_("launching the sausage-rat..."))
-        image = gdkpixbuf.Pixbuf.new_from_file(IMAGE_FILE)
-        self.messagedialog.set_icon(image)
-        self.messagedialog.connect("response", self.welcome_response)
-        self.messagedialog.show()
-
-    def _open_web_ui_menu_activated(self, menu_item):
-        print("activated %s" % (str(menu_item), ))
 
     def _rtprot_menu_activated(self, menu_item):
         print("activated %s" % (str(menu_item), ))
         menu_item.toggled()
 
     def notify(self, msg):
-#        self.notification.update(_("<b>Yes!</b>"), _("sausage-rat put into orbit successfully!!!"))
         self.notification.update(_("<b>notify!</b>"), _(msg))
         self.notification.show()
 
-    def welcome_response(self, widget, response_id):
-        self.notify()
-        widget.destroy()
