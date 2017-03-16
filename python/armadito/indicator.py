@@ -38,56 +38,28 @@ INDICATOR_ID='indicator-armadito'
 # separator
 # Latest threats ???
 
+state2icon = { \
+               model.AntivirusState.absent : 'indicator-armadito-desactive.svg', \
+               model.AntivirusState.not_working : 'indicator-armadito-desactive.svg', \
+               model.AntivirusState.not_up_to_date : 'indicator-armadito-dark.svg', \
+               model.AntivirusState.working_and_up_to_date : 'indicator-armadito-dark.svg', \
+}
+
 class ArmaditoIndicator(object):
     def __init__(self):
-        self._antivirus_version = _('<unknown>')
-        self._update_date = _('<unknown>')
+        self._model = model.AntivirusModel()
+        self._model.notify_property('state', self._on_state_change)
         self._indicator_init()
         self._notify_init()
-        self._connection_init()
-        if self._connected:
-            self._conn.call("status", callback = self._on_status)
+        self._model.connect()
 
-    def _on_status(self, info):
-        self._antivirus_version = info.antivirus_version
-        self._version_menu_item.set_label(_('Armadito: version %s') % (self._antivirus_version,))
-        self._update_date = datetime.datetime.fromtimestamp(info.global_update_ts).strftime('%x %X')
-        self._update_date_menu_item.set_label(_('Latest bases update: %s') % (self._update_date))
-
-    def _on_timeout(self):
-        try:
-            self._conn.connect()
-        except OSError as e:
-            print(str(e))
-            return True
-        self._timeout_id = None
-        return False
-
-    def _start_timeout(self):
-            self._timeout_id = gobject.timeout_add(1000, self._on_timeout)
-
-    def _connection_listener(self, connected):
-        print("connected:", connected)
-        if connected:
-            self.indicator.set_icon('indicator-armadito-dark')
-        else:
-            self.indicator.set_icon('indicator-armadito-missing')
-            if self._connected is True:
-                self._start_timeout()
-        self._connected = connected
+    def _on_state_change(self, old_state, state):
+        self.indicator.set_icon(state2icon[state])
         
-    def _connection_init(self):
-        self._connected = False
-        self._conn = jrpc.Connection('\0/tmp/.armadito-daemon')
-        #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
-        #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
-        self._timeout_id = None
-        self._conn.set_listener(self._connection_listener)
-        try:
-            self._conn.connect()
-        except OSError as e:
-            print(str(e))
-            self._start_timeout()
+    def _on_status(self, info):
+        self._version_menu_item.set_label(_('Armadito: version %s') % (self._model.version,))
+        self._update_date = datetime.datetime.fromtimestamp(info.global_update_ts).strftime('%x %X')
+        self._update_date_menu_item.set_label(_('Latest bases update: %s') % (self._model.update_date))
 
     def _indicator_init(self):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
@@ -100,10 +72,10 @@ class ArmaditoIndicator(object):
 
     def _build_menu_gtk(self):
         menu = gtk.Menu()
-        self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._antivirus_version,))
+        self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._model.version,))
         self._version_menu_item.set_sensitive(False)
         menu.append(self._version_menu_item)
-        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % (self._update_date))
+        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % (self._model.update_date))
         self._update_date_menu_item.set_sensitive(False)
         menu.append(self._update_date_menu_item)
         menu.append(gtk.SeparatorMenuItem())

@@ -16,6 +16,56 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 from armadito import notifier, jrpc
+import enum
 
-class AVModel(notifier.Notifier):
-    pass
+class AntivirusState(enum.Enum):
+    absent = 1
+    not_working = 2
+    not_up_to_date = 3
+    working_and_up_to_date = 4
+    
+class AntivirusModel(notifier.Notifier):
+    def __init__(self):
+        super().__init__()
+        self.state = AntivirusState.absent
+        self.version = '<unknown>'
+        self.update_date = '<unknown>'
+        self._conn = jrpc.Connection('\0/tmp/.armadito-daemon')
+        self._timeout_id = None
+        self._conn.notify_property('connected', self._connection_listener)
+
+    def _on_timeout(self):
+        try:
+            self._conn.connect()
+        except OSError as e:
+            print(str(e))
+            return True
+        self._timeout_id = None
+        return False
+
+    def _start_timeout(self):
+            self._timeout_id = gobject.timeout_add(1000, self._on_timeout)
+
+    def _connection_listener(self, old_connected, connected):
+        print("connected:", connected)
+        if connected:
+            self._conn.call("status", callback = self._on_status)
+            self.state = AntivirusState.not_working
+        else:
+            self.state = AntivirusState.absent
+            if old_connected is True:
+                self._start_timeout()
+        
+    def connect(self):
+        #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
+        #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
+        try:
+            self._conn.connect()
+        except OSError as e:
+            print(str(e))
+            self._start_timeout()
+
+    def _on_status(self, info):
+        self.version = info.antivirus_version
+        self.update_date = datetime.datetime.fromtimestamp(info.global_update_ts).strftime('%x %X')
+        #self.state = 

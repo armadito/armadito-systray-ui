@@ -119,10 +119,10 @@ class Connection(notifier.Notifier):
         self._sock = None
         self._sock_path = sock_path
         self._watch_id = None
-        self._connection_listener = None
         self._response_id = 1
         self._response_callbacks = {}
         self._mapper = {}
+        self.connected = False
 
     def map(self, method, fun):
         """maps incoming calls
@@ -131,13 +131,6 @@ class Connection(notifier.Notifier):
         fun    -- the callable to call when receiving a JSON-RPC request
         """
         self._mapper[method] = fun
-
-    def set_listener(self, listener):
-        self._connection_listener = listener
-
-    def _notify_listener(self, connected):
-        if self._connection_listener is not None:
-            self._connection_listener(connected)
 
     def connect(self):
         """connects to Unix socket and install file descriptor watch callback"""
@@ -149,13 +142,13 @@ class Connection(notifier.Notifier):
             self._sock = None
             raise
         self._watch_id = gobject.io_add_watch(self._sock.fileno(), gobject.IO_IN | gobject.IO_ERR, _on_message_received, self)
-        self._notify_listeners(True)
+        self.connected = True
 
     def _close(self):
         self._sock.close()
         self._sock = None
-        self._notify_listeners(False)
         self._watch_id = None
+        self.connected = False
         
     def close(self):
         """close the Unix socket and remove file descriptor watch callback"""
