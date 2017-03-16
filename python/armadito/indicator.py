@@ -40,8 +40,8 @@ INDICATOR_ID='indicator-armadito'
 
 class ArmaditoIndicator(object):
     def __init__(self):
-        self._antivirus_version = '<unknown>'
-        self._update_date = '<unknown>'
+        self._antivirus_version = _('<unknown>')
+        self._update_date = _('<unknown>')
         self._indicator_init()
         self._notify_init()
         self._connection_init()
@@ -82,7 +82,7 @@ class ArmaditoIndicator(object):
         #    c.map({ 'notify_event' : (lambda o : i.notify(str(o))) })
         #c.map({ 'notify_event' : (lambda o : print('lambda %s' % (str(o),))) })
         self._timeout_id = None
-        self._conn.add_listener(self._connection_listener)
+        self._conn.set_listener(self._connection_listener)
         try:
             self._conn.connect()
         except OSError as e:

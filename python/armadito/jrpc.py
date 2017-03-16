@@ -117,7 +117,7 @@ class Connection(object):
         self._sock = None
         self._sock_path = sock_path
         self._watch_id = None
-        self._connection_listeners = []
+        self._connection_listener = None
         self._response_id = 1
         self._response_callbacks = {}
         self._mapper = {}
@@ -130,15 +130,12 @@ class Connection(object):
         """
         self._mapper[method] = fun
 
-    def add_listener(self, listener):
-        self._connection_listeners.append(listener)
+    def set_listener(self, listener):
+        self._connection_listener = listener
 
-    def remove_listener(self, listener):
-        self._connection_listeners.remove(listener)
-
-    def _notify_listeners(self, connected):
-        for listener in self._connection_listeners:
-            listener(connected)
+    def _notify_listener(self, connected):
+        if self._connection_listener is not None:
+            self._connection_listener(connected)
 
     def connect(self):
         """connects to Unix socket and install file descriptor watch callback"""
