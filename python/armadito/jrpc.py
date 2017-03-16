@@ -18,6 +18,7 @@
 import json
 import socket
 from gi.repository import GObject as gobject
+from armadito import notifier
 
 class MarshallingError(Exception):
     """Marshalling exception for marshall() and unmarshall() functions"""
@@ -104,7 +105,7 @@ def _is_request(jrpc_obj):
 def _is_response(jrpc_obj):
     return 'result' in jrpc_obj and 'id' in jrpc_obj and not 'error' in jrpc_obj
 
-class Connection(object):
+class Connection(notifier.Notifier):
     """JSON-RPC connection over a Unix socket
 
     Provides methods and notifications calls, and asynchronous callbacks.
@@ -114,6 +115,7 @@ class Connection(object):
         """Arguments:
         sock_path -- the path to the Unix socket
         """
+        super().__init__()
         self._sock = None
         self._sock_path = sock_path
         self._watch_id = None

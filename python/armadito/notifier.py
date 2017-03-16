@@ -31,9 +31,10 @@ def check_private(name):
 
 class Notifier(object):
     def __init__(self):
-        self._notify_property = {}
-        self._notify_before = {}
-        self._notify_after = {}
+        # calling __setattr__ of this class is too early as __setattr__ checks for _notify_property
+        super().__setattr__('_notify_property', {})
+        super().__setattr__('_notify_before', {})
+        super().__setattr__('_notify_after', {})
 
     def notify_before(self, name, fun):
         check_private(name)
@@ -71,9 +72,15 @@ class Notifier(object):
         return attr            
 
     def __setattr__(self, name, value):
+        if not name in self._notify_property:
+            super().__setattr__(name, value)
+        try:
+            old_value = super().__getattribute__(name)
+        except:
+            old_value = None
         super().__setattr__(name, value)
-        if name in self._notify_property:
-            self._notify_property[name](value)
+        if old_value != value:
+            self._notify_property[name](old_value, value)
 
 if __name__ == '__main__':
     class TestCounter(Notifier):
@@ -104,7 +111,7 @@ if __name__ == '__main__':
     a1.notify_before('dec', lambda *args, **kwargs: print("I'm the before 'dec' lambda", *args, **kwargs))
     a1.notify_after('inc', lambda retval: print("I'm the after 'inc' lambda", retval))
     a1.notify_before('fun', lambda *args, **kwargs: print("I'm the before 'fun' lambda", *args, **kwargs))
-    a1.notify_property('count', lambda value: print("I'm the 'count' property lambda", value))
+    a1.notify_property('count', lambda old_value, value: print("I'm the 'count' property lambda", 'old', old_value, 'new', value))
     a1.inc()
     a1.inc()
     a1.dec(10)
