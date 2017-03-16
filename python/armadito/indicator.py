@@ -49,6 +49,8 @@ class ArmaditoIndicator(object):
     def __init__(self):
         self._model = model.AntivirusModel()
         self._model.notify_property('state', self._on_state_change)
+        self._model.notify_property('version', self._on_version_change)
+        self._model.notify_property('update_timestamp', self._on_update_timestamp_change)
         self._indicator_init()
         self._notify_init()
         self._model.connect()
@@ -56,10 +58,15 @@ class ArmaditoIndicator(object):
     def _on_state_change(self, old_state, state):
         self.indicator.set_icon(state2icon[state])
         
-    def _on_status(self, info):
-        self._version_menu_item.set_label(_('Armadito: version %s') % (self._model.version,))
-        self._update_date = datetime.datetime.fromtimestamp(info.global_update_ts).strftime('%x %X')
-        self._update_date_menu_item.set_label(_('Latest bases update: %s') % (self._model.update_date))
+    def _on_version_change(self, old_version, version):
+        self._version_menu_item.set_label(_('Armadito: version %s') % (version,))
+
+    def _on_update_timestamp_change(self, old_timestamp, timestamp):
+        if timestamp is not 0:
+            update_date = datetime.datetime.fromtimestamp(timestamp).strftime('%x %X')
+        else:
+            update_date = '<unknown>'
+        self._update_date_menu_item.set_label(_('Latest bases update: %s') % (update_date))
 
     def _indicator_init(self):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
@@ -75,7 +82,7 @@ class ArmaditoIndicator(object):
         self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._model.version,))
         self._version_menu_item.set_sensitive(False)
         menu.append(self._version_menu_item)
-        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % (self._model.update_date))
+        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % ('unknown'))
         self._update_date_menu_item.set_sensitive(False)
         menu.append(self._update_date_menu_item)
         menu.append(gtk.SeparatorMenuItem())
