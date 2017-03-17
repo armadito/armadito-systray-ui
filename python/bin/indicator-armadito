@@ -17,7 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
-from armadito import indicator
+import armadito.model
+import armadito.dbus
+import armadito.indicator
+import dbus.mainloop.glib
 from gi.repository import Gtk as gtk
 import gettext
 from gettext import gettext as _
@@ -30,6 +33,10 @@ def foobar(o):
 if __name__ == "__main__":
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+    dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
+    antivirus = armadito.model.AntivirusModel()
+    indicator = armadito.indicator.ArmaditoIndicator(antivirus)
+    dbus_object = armadito.dbus.AntivirusObject(antivirus)
+    antivirus.connect()
     print(_("indicator-armadito (C) Teclib' 2016"));
-    i = indicator.ArmaditoIndicator()
     gtk.main()

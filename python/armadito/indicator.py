@@ -16,15 +16,14 @@
 # along with Armadito indicator.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import datetime
+import locale
 from armadito import jrpc, model
 from gi.repository import Gtk as gtk
 from gi.repository import Gio as gio
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Notify as notify
 from gi.repository import GdkPixbuf as gdkpixbuf
-from gi.repository import GObject as gobject
-import datetime
-import locale
 from gettext import gettext as _
 
 INDICATOR_ID='indicator-armadito'
@@ -46,14 +45,13 @@ state2icon = { \
 }
 
 class ArmaditoIndicator(object):
-    def __init__(self):
-        self._model = model.AntivirusModel()
+    def __init__(self, model):
+        self._model = model
         self._model.notify_property('state', self._on_state_change)
         self._model.notify_property('version', self._on_version_change)
         self._model.notify_property('update_timestamp', self._on_update_timestamp_change)
         self._indicator_init()
         self._notify_init()
-        self._model.connect()
 
     def _on_state_change(self, old_state, state):
         self.indicator.set_icon(state2icon[state])

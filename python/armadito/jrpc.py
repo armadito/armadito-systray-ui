@@ -17,6 +17,7 @@
 
 import json
 import socket
+import sys
 from gi.repository import GObject as gobject
 from armadito import notifier
 
@@ -105,6 +106,9 @@ def _is_request(jrpc_obj):
 def _is_response(jrpc_obj):
     return 'result' in jrpc_obj and 'id' in jrpc_obj and not 'error' in jrpc_obj
 
+def _is_error(jrpc_obj):
+    return 'error' in jrpc_obj and not 'result' in jrpc_obj
+
 class Connection(notifier.Notifier):
     """JSON-RPC connection over a Unix socket
 
@@ -190,12 +194,21 @@ class Connection(notifier.Notifier):
         result = unmarshall(jrpc_obj['result'])
         cb(result)
 
+    def _error_handler(self, code, message, id):
+        print('JSON-RPC error:', 'code=', code, 'message=', message, 'id=', id, file=sys.stderr)
+
+    def _process_error(self, jrpc_obj):
+        j_error = jrpc_obj['error']
+        self._error_handler(j_error['code'], j_error['message'], jrpc_obj['id'])
+
     def _dispatch(self, jrpc_obj):
         _basic_check(jrpc_obj)
         if _is_request(jrpc_obj):
             self._process_request(jrpc_obj)
         elif _is_response(jrpc_obj):
             self._process_response(jrpc_obj)
+        elif _is_error(jrpc_obj):
+            self._process_error(jrpc_obj)
         else:
             raise JsonRPCError('not implemented JSON-RPC: %s' % (repr(jrpc_obj)))
 
