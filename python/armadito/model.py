@@ -32,6 +32,7 @@ class AntivirusModel(notifier.Notifier):
         self.version = '<unknown>'
         self.update_timestamp = 0
         self._timeout_id = None
+        self._error_count = 0
         self._conn = jrpc.Connection('\0/tmp/.armadito-daemon')
         self._conn.notify_property('connected', self._connection_listener)
         self._conn.map('notify_event', self._notify_event)
@@ -40,7 +41,9 @@ class AntivirusModel(notifier.Notifier):
         try:
             self._conn.connect()
         except OSError as e:
-            print(str(e))
+            if self._error_count == 0:
+                print(str(e))
+            self._error_count += 1
             return True
         self._timeout_id = None
         return False
@@ -56,6 +59,7 @@ class AntivirusModel(notifier.Notifier):
         else:
             self.state = AntivirusState.absent
             if old_connected is True:
+                self._error_count = 0
                 self._start_timeout()
         
     def connect(self):
@@ -63,11 +67,16 @@ class AntivirusModel(notifier.Notifier):
             self._conn.connect()
         except OSError as e:
             print(str(e))
+            self._error_count = 0
             self._start_timeout()
 
     def _status_cb(self, info):
         self.version = info.antivirus_version
         self.update_timestamp = info.global_update_ts
+        if info.global_status == 'A6O_UPDATE_OK':
+            self.state = AntivirusState.working_and_up_to_date
+        elif info.global_status == 'A6O_UPDATE_CRITICAL':
+            self.state = AntivirusState.not_up_to_date
 
     def _notify_event(self, event):
         pass

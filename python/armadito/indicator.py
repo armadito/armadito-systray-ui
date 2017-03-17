@@ -38,22 +38,23 @@ INDICATOR_ID='indicator-armadito'
 # Latest threats ???
 
 state2icon = { \
-               model.AntivirusState.absent : 'indicator-armadito-desactive.svg', \
-               model.AntivirusState.not_working : 'indicator-armadito-desactive.svg', \
-               model.AntivirusState.not_up_to_date : 'indicator-armadito-dark.svg', \
-               model.AntivirusState.working_and_up_to_date : 'indicator-armadito-dark.svg', \
+               model.AntivirusState.absent : 'indicator-armadito-desactive', \
+               model.AntivirusState.not_working : 'indicator-armadito-desactive', \
+               model.AntivirusState.not_up_to_date : 'indicator-armadito-down', \
+               model.AntivirusState.working_and_up_to_date : 'indicator-armadito-dark', \
 }
 
 class ArmaditoIndicator(object):
-    def __init__(self, model):
+    def __init__(self, model, prefix = '/usr'):
         self._model = model
         self._model.notify_property('state', self._on_state_change)
         self._model.notify_property('version', self._on_version_change)
         self._model.notify_property('update_timestamp', self._on_update_timestamp_change)
-        self._indicator_init()
+        self._indicator_init(prefix)
         self._notify_init()
 
     def _on_state_change(self, old_state, state):
+        print('state change', str(old_state), str(state))
         self.indicator.set_icon(state2icon[state])
         
     def _on_version_change(self, old_version, version):
@@ -66,13 +67,13 @@ class ArmaditoIndicator(object):
             update_date = '<unknown>'
         self._update_date_menu_item.set_label(_('Latest bases update: %s') % (update_date))
 
-    def _indicator_init(self):
+    def _indicator_init(self, prefix):
         self.indicator = appindicator.Indicator.new(INDICATOR_ID,
-                                                    'indicator-armadito-dark',
+                                                    state2icon[self._model.state],
                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self.indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
-        self.indicator.set_icon_theme_path("/usr/share/icons")
-        self.indicator.set_icon('indicator-armadito')
+        self.indicator.set_icon_theme_path(prefix + "/share/icons")
+        self.indicator.set_icon(state2icon[self._model.state])
         self.indicator.set_menu(self._build_menu_gtk())
 
     def _build_menu_gtk(self):

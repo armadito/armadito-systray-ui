@@ -35,7 +35,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
     antivirus = armadito.model.AntivirusModel()
-    indicator = armadito.indicator.ArmaditoIndicator(antivirus)
+    indicator = armadito.indicator.ArmaditoIndicator(antivirus, prefix = '/home/fdechelle/projects/armadito/install')
     dbus_object = armadito.dbus.AntivirusObject(antivirus)
     antivirus.connect()
     print(_("indicator-armadito (C) Teclib' 2016"));
