@@ -61,14 +61,14 @@ setup(
         "License :: OSI Approved :: GPLv3 License",
     ],
     packages = ['armadito'],
-#    scripts = ['bin/indicator-armadito'],
+    scripts = ['bin/indicator-armadito'],
     data_files = [('share/icons/hicolor/scalable/apps', [
         'icons/scalable/indicator-armadito-dark.svg',
         'icons/scalable/indicator-armadito-desactive.svg',
         'icons/scalable/indicator-armadito-down.svg',
         'icons/scalable/indicator-armadito-missing.svg',
         'icons/scalable/indicator-armadito.svg'])],
-    cmdclass = {"install": install}
+#    cmdclass = {"install": install}
 )
 
 #
