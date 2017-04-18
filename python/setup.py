@@ -6,19 +6,16 @@
 # Thank you!
 
 import os
-import shutil
-import stat
+import glob
 from setuptools import setup
 from setuptools.command.install import install as _install
-#from babel.messages import frontend as babel
+from babel.messages import frontend as babel
 
-def do_edit_file(in_file, out_file, from_str, to_str):
-    in_content = open(in_file).read()
-    out_content = in_content.replace(from_str, to_str)
-    open(out_file, 'w').write(out_content)
-    
 def read(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
+
+def get_langs():
+    return [os.path.basename(x).replace('.po', '') for x in glob.iglob('po/*.po')]
 
 setup(
     name = "Armadito antivirus indicator",
@@ -35,14 +32,15 @@ setup(
         "Topic :: Utilities",
         "License :: OSI Approved :: GPLv3 License",
     ],
+    setup_requires = ['babel'],
     packages = ['armadito'],
     scripts = ['bin/indicator-armadito'],
-    data_files = [('share/icons/hicolor/scalable/apps', [
-        'icons/scalable/indicator-armadito-dark.svg',
-        'icons/scalable/indicator-armadito-desactive.svg',
-        'icons/scalable/indicator-armadito-down.svg',
-        'icons/scalable/indicator-armadito-missing.svg',
-        'icons/scalable/indicator-armadito.svg'])]
+    data_files = [('share/icons/hicolor/scalable/apps', ['icons/scalable/indicator-armadito-dark.svg',
+                                                         'icons/scalable/indicator-armadito-desactive.svg',
+                                                         'icons/scalable/indicator-armadito-down.svg',
+                                                         'icons/scalable/indicator-armadito-missing.svg',
+                                                         'icons/scalable/indicator-armadito.svg']),
+    ],
 )
 
 #
