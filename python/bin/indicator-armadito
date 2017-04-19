@@ -23,7 +23,6 @@ import armadito.indicator
 import dbus.mainloop.glib
 from gi.repository import Gtk as gtk
 import gettext
-from gettext import locale, bindtextdomain, textdomain
 import os
 import sys
 
@@ -32,19 +31,16 @@ def get_prefix():
     prefix = os.path.dirname(os.path.dirname(script))
     return os.path.abspath(prefix)
 
-def init_i18n(prefix):
-    bindtextdomain("indicator-armadito", prefix + '/share/locale')
-    gettext.textdomain('indicator-armadito')
-
 if __name__ == "__main__":
     import signal
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     dbus.mainloop.glib.DBusGMainLoop(set_as_default = True)
     prefix = get_prefix()
-    init_i18n(prefix)
+    gettext.bindtextdomain("indicator-armadito", localedir = prefix + '/share/locale')
+    gettext.textdomain('indicator-armadito')
     antivirus = armadito.model.AntivirusModel()
     indicator = armadito.indicator.ArmaditoIndicator(antivirus, prefix = prefix)
     dbus_object = armadito.dbus.AntivirusObject(antivirus)
     antivirus.connect()
-    print(_("indicator-armadito (C) Teclib' 2016"));
+    print("indicator-armadito (C) Teclib' 2016");
     gtk.main()

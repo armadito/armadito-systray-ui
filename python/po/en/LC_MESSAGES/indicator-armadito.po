@@ -4,39 +4,40 @@
 # indicator project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Armadito antivirus indicator 0.10.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-04-19 16:52+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2017-04-19 17:07+0200\n"
+"PO-Revision-Date: 2017-04-19 17:07+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: armadito/indicator.py:61 armadito/indicator.py:81 armadito/indicator.py:117
 #, python-format
 msgid "Armadito: version %s"
-msgstr ""
+msgstr "Armadito: version %s"
 
 #: armadito/indicator.py:67
 msgid "<unknown>"
-msgstr ""
+msgstr "<unknown>"
 
 #: armadito/indicator.py:68 armadito/indicator.py:84
 #, python-format
 msgid "Latest bases update: %s"
-msgstr ""
+msgstr "Latest bases update: %s"
 
 #: armadito/indicator.py:88
 msgid "Real-time protection"
-msgstr ""
+msgstr "Real-time protection"
 
 #: armadito/indicator.py:133
 msgid "<b>notify!</b>"
-msgstr ""
-
+msgstr "<b>notify!</b>"

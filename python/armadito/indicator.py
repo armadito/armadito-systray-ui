@@ -58,13 +58,13 @@ class ArmaditoIndicator(object):
         self.indicator.set_icon(state2icon[state])
         
     def _on_version_change(self, old_version, version):
-        self._version_menu_item.set_label(_('Armadito: version %s') % (version,))
+        self._version_menu_item.set_label(_('Armadito: version %s') % (_(version),))
 
     def _on_update_timestamp_change(self, old_timestamp, timestamp):
         if timestamp is not 0:
             update_date = datetime.datetime.fromtimestamp(timestamp).strftime('%x %X')
         else:
-            update_date = '<unknown>'
+            update_date = _('<unknown>')
         self._update_date_menu_item.set_label(_('Latest bases update: %s') % (update_date))
 
     def _indicator_init(self, prefix):
@@ -78,10 +78,10 @@ class ArmaditoIndicator(object):
 
     def _build_menu_gtk(self):
         menu = gtk.Menu()
-        self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % (self._model.version,))
+        self._version_menu_item = gtk.MenuItem(_('Armadito: version %s') % _(self._model.version,))
         self._version_menu_item.set_sensitive(False)
         menu.append(self._version_menu_item)
-        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % ('unknown'))
+        self._update_date_menu_item = gtk.MenuItem(_('Latest bases update: %s') % _('<unknown>'))
         self._update_date_menu_item.set_sensitive(False)
         menu.append(self._update_date_menu_item)
         menu.append(gtk.SeparatorMenuItem())
