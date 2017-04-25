@@ -27,6 +27,6 @@ class AntivirusObject(dbus.service.Object):
 
     @dbus.service.method("org.armadito.AntivirusInterface",
                          in_signature='s', out_signature='')
-    def Scan(self, path):
+    def scan(self, path):
         print('org.armadito.AntivirusInterface.scan(%s)' % (str(path),))
         self._antivirus.scan(str(path))

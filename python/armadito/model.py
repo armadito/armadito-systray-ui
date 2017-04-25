@@ -18,6 +18,8 @@
 from armadito import notifier, jrpc
 from gi.repository import GObject as gobject
 import enum
+import sys
+import random
 
 class AntivirusState(enum.Enum):
     absent = 1
@@ -81,12 +83,17 @@ class AntivirusModel(notifier.Notifier):
     def _notify_event(self, event):
         pass
 
+    def _create_scan_id(self):
+        random.seed()
+        return random.randrange(sys.maxsize)
+        
     def scan(self, path):
         scan_params = jrpc.MarshallObject()
         scan_params.root_path = path
         scan_params.recursive = 1
         scan_params.threaded = 1
         scan_params.send_progress = 1
-        scan_params.scan_id = 42
+        scan_params.scan_id = self._create_scan_id()
+        print(scan_params.scan_id)
         self._conn.call('scan', params = scan_params)
 
